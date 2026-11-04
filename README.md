@@ -111,3 +111,7 @@ Label JSONL，每行：
 - [Pricing](https://developers.openai.com/api/docs/pricing)
 
 沒有複製其他 repo 的執行程式。`data/`、`runs/`、本機設定與憑證均被 git 忽略。
+
+## Troubleshooting
+
+`data_approved_for_endpoint is false` means the local preflight stopped before sending a request. It does not mean the API key was rejected. Check that the configured endpoint is permitted to process the selected input data. If confirmed, edit only `data_approved_for_endpoint` to `true` in the ignored `config.local.json`; do not paste the key or full config into an issue/chat. Otherwise use approved de-identified inputs or the institution-approved endpoint. This flag records operator confirmation; it does not de-identify data.

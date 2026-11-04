@@ -103,4 +103,21 @@ class ExecutionTests(unittest.TestCase):
             self.assertEqual(summary['test-model']['target_recall'],1)
             for file in run.iterdir():self.assertNotIn(config['api_key'],file.read_text())
 
+class SetupMessageTests(unittest.TestCase):
+    def test_known_setup_message_is_actionable(self):
+        import contextlib
+        import io
+        stream=io.StringIO()
+        with patch.object(app,'main',side_effect=app.SetupError('Set data_approved_for_endpoint after confirming data approval')), contextlib.redirect_stdout(stream):
+            self.assertEqual(app.cli(),1)
+        self.assertIn('data_approved_for_endpoint',stream.getvalue())
+
+    def test_unknown_error_message_is_not_echoed(self):
+        import contextlib
+        import io
+        stream=io.StringIO()
+        with patch.object(app,'main',side_effect=ValueError('SECRET_SENTINEL')), contextlib.redirect_stdout(stream):
+            self.assertEqual(app.cli(),1)
+        self.assertNotIn('SECRET_SENTINEL',stream.getvalue())
+
 if __name__=='__main__': unittest.main()

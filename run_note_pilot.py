@@ -98,14 +98,18 @@ def make_payload(model, prompt, case, max_tokens, effort):
     return value
 
 
+class SetupError(ValueError):
+    """Only program-authored, credential-free messages may be displayed."""
+
+
 def check_live_config(config, key):
     url = urllib.parse.urlparse(config['base_url'])
     if url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment:
-        raise ValueError('API base URL must be HTTPS without credentials, query or fragment')
+        raise SetupError('API base URL must be HTTPS without credentials, query or fragment')
     if not key or not key.strip() or key.strip() in ['YOUR_KEY_HERE', 'REPLACE_ME']:
-        raise ValueError('Set a new API key with configure_key.py or OPENAI_API_KEY')
+        raise SetupError('Set a new API key with configure_key.py or OPENAI_API_KEY')
     if config.get('data_approved_for_endpoint') is not True:
-        raise ValueError('Clinical data is not marked approved for this endpoint in config.local.json; do not send raw patient notes to an unapproved personal endpoint')
+        raise SetupError('data_approved_for_endpoint is false in config.local.json. Use data approved for the configured endpoint; set this flag true only after that is confirmed. No API request was sent.')
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -276,10 +280,18 @@ def main():
     print('Results:', directory)
 
 
-if __name__ == '__main__':
+def cli():
     try:
         main()
+        return 0
+    except SetupError as error:
+        print('Setup failed:', str(error))
+        return 1
     except (ValueError, OSError) as error:
-        # Setup failures must not print configuration contents or credential-bearing URLs.
+        # Untrusted parser/OS errors may echo private data; only show their type.
         print('Setup failed:', type(error).__name__, '(check input paths and local configuration; no secrets printed)')
-        raise SystemExit(1)
+        return 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(cli())
