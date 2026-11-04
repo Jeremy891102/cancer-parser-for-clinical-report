@@ -24,4 +24,4 @@ icd10_source_id
 
 `in_*` means present in the corresponding source, not positive. Exclusions retain source-specific reasons and IDs. No identified target cancer does not automatically establish an eligible negative control.
 
-NOTE top-level diagnosis_date follows its selected category, including Borderline, Benign, Other and dated unresolved lesions. Only a supported target Malignant date contributes to the cohort onset. PATH/ICD/merge implementation is pending; the current runnable code is NOTE model evaluation only.
+NOTE top-level diagnosis_date follows its selected category, including Borderline, Benign, Other and dated unresolved lesions. Only a supported target Malignant date contributes to the cohort onset. PATH/ICD/merge implementation is pending; the current runnable code includes NOTE model evaluation and offline NOTE patient-level postprocessing.

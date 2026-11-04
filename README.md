@@ -1,6 +1,6 @@
 # Ovarian cancer parser
 
-研究用的 PATH／progress NOTE／ICD pipeline。**目前已實作 NOTE 的本機模型比較程式**；PATH、ICD 與 patient-level 合併尚未實作。程式不做臨床診斷。
+研究用的 PATH／progress NOTE／ICD pipeline。**目前已實作 NOTE 的本機模型比較與離線 patient-level 後處理**；PATH、ICD 與 patient-level 合併尚未實作。程式不做臨床診斷。
 
 ## 現在可以做什麼
 
@@ -21,6 +21,28 @@ python3 run_note_pilot.py --limit 20
 ```
 
 最後一行只檢查本機資料與預計請求數，沒有 API 費用。
+
+### 不用 API：先跑通 patient-level pipeline
+
+```bash
+python3 postprocess_notes.py
+```
+
+預設讀取本機 `data/note_labels_20.jsonl`（你已 review 的 parsing outputs）。不需要 key、不讀 key、不連網。可用 `--input` 指定其他同格式 JSONL，或 `--output-dir` 指定新的輸出資料夾；既有資料夾不會覆寫。
+
+輸出至被 git 忽略的 `runs/note-postprocess-<timestamp>/`：
+
+- `note_patient_level.csv`：所有可連結 MRN，欄位為 MRN、progress_note_positive_date、in_progress_note、progress_note_source_id。
+- `note_target_positive.csv`：有可用 target malignant 日期的病人。
+- `note_review.csv`：日期未知、原發／分類未定、格式衝突等問題與來源 ID；不是最終 cohort exclusion 判定。
+- `note_non_target.csv`：目前未建立 target malignancy 的其餘病人；不等於合格 negative controls。
+- `validation_and_patient_audit.json`、`summary.json`：完整狀態與來源追溯。
+
+CSV 的 source ID 欄以 JSON array 保存多個同日來源，避免漏掉支持證據。MRN 保留為字串；若用 Excel 開啟請按文字欄匯入，避免前導零被改掉。
+
+程式先驗證格式，再按 MRN 合併。只使用 Malignant 且診斷支持已確認 target origin 的日期；NED 或後續良性結果不取消既往癌症。不同精度日期若重疊且無法自動比較，列入 review，不補 1 月 1 日。相同 NOTE ID 的互相矛盾版本不會默默選一筆。
+
+20 份真實 review 結果來自20位不同病人，只驗證格式及分類篩選；多 NOTE 同病人、NED、日期精度與 ID 衝突另外用合成資料測試。這次不是模型預測或準確率實驗。PATH／ICD／三來源合併尚未接入，不能把此輸出當作最終 onset CSV。
 
 ### 設定金鑰
 
