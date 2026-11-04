@@ -1,0 +1,18 @@
+{
+  "mrn": null,
+  "note_id": null,
+  "note_signed_time": null,
+  "diagnosis_date": null,
+  "family_history_of_ovarian_cancer_documented": false,
+  "diagnoses": [
+    {
+      "diagnosis_as_documented": null,
+      "histologic_subtype": null,
+      "diagnostic_qualification": null,
+      "primary_origin_site": null,
+      "primary_origin_certainty": null,
+      "temporal_status": null
+    }
+  ],
+  "derived_classification": "Uncertain"
+}

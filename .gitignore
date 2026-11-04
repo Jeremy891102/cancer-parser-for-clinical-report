@@ -1,0 +1,19 @@
+# Private local material: never publish patient records, annotations or credentials.
+data/
+runs/
+config.local.json
+config.*.local.json
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.csv
+*.jsonl
+*.xlsx
+*.docx
+*.html
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store

@@ -1,0 +1,226 @@
+[
+  {
+    "name": "Adenocarcinoma, subtype unspecified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Carcinosarcoma (malignant mixed Müllerian tumor)",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Clear cell carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Endometrioid carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "High-grade serous carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Low-grade serous carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Mucinous carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Papillary adenocarcinoma, unspecified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Psammocarcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Serous carcinoma, grade not specified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Carcinoma / cancer, subtype unspecified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Dysgerminoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Embryonal carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Immature teratoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Malignant germ cell tumor, unspecified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Malignant struma ovarii",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Malignant teratoma, unspecified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Yolk sac tumor (endodermal sinus tumor)",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Choriocarcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Malignant carcinoid tumor",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Small cell carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Granulosa cell tumor",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Malignant theca / steroid-producing tumor",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Sertoli cell carcinoma",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Stromal carcinoma, unspecified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Malignant neoplasm, subtype unspecified",
+    "reference_group": "Malignant"
+  },
+  {
+    "name": "Clear cell borderline tumor",
+    "reference_group": "Borderline"
+  },
+  {
+    "name": "Endometrioid borderline tumor",
+    "reference_group": "Borderline"
+  },
+  {
+    "name": "Mucinous borderline tumor",
+    "reference_group": "Borderline"
+  },
+  {
+    "name": "Seromucinous borderline tumor",
+    "reference_group": "Borderline"
+  },
+  {
+    "name": "Serous borderline tumor",
+    "reference_group": "Borderline"
+  },
+  {
+    "name": "Borderline tumor, subtype unspecified",
+    "reference_group": "Borderline"
+  },
+  {
+    "name": "Endometrioid adenofibroma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Mucinous adenofibroma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Mucinous cystadenoma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Serous adenofibroma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Serous cyst",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Serous cystadenoma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Mature cystic / benign teratoma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Ovarian stromal hyperplasia",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Benign stromal tumor, unspecified",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Fibroma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Sclerosing stromal tumor",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Thecoma",
+    "reference_group": "Benign"
+  },
+  {
+    "name": "Colorectal carcinoma",
+    "reference_group": "Other"
+  },
+  {
+    "name": "Non-target adnexal / skin / ocular carcinoma",
+    "reference_group": "Other"
+  },
+  {
+    "name": "Peritoneal mesothelioma",
+    "reference_group": "Other"
+  },
+  {
+    "name": "Brenner tumor, behavior unspecified",
+    "reference_group": "Uncertain"
+  },
+  {
+    "name": "Clear cell neoplasm, unspecified",
+    "reference_group": "Uncertain"
+  },
+  {
+    "name": "Germ cell tumor, behavior unspecified",
+    "reference_group": "Uncertain"
+  },
+  {
+    "name": "Teratoma, behavior unspecified",
+    "reference_group": "Uncertain"
+  },
+  {
+    "name": "Granulosa-theca cell tumor",
+    "reference_group": "Uncertain"
+  },
+  {
+    "name": "Sertoli–Leydig cell tumor",
+    "reference_group": "Uncertain"
+  },
+  {
+    "name": "Sex cord stromal tumor, behavior unspecified",
+    "reference_group": "Uncertain"
+  },
+  {
+    "name": "Ovarian carcinoma in situ, unspecified",
+    "reference_group": "Separate precursor"
+  },
+  {
+    "name": "STIC",
+    "reference_group": "Separate precursor"
+  }
+]

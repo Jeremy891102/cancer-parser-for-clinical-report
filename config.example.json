@@ -1,0 +1,35 @@
+{
+  "base_url": "https://api.openai.com/v1",
+  "api_key": "",
+  "data_approved_for_endpoint": false,
+  "max_completion_tokens": 3000,
+  "models": [
+    {
+      "id": "gpt-5.4-mini",
+      "reasoning_effort": "low",
+      "rates_per_million": {
+        "input": 0.75,
+        "cached_input": 0.075,
+        "output": 4.5
+      }
+    },
+    {
+      "id": "gpt-6-luna",
+      "reasoning_effort": "low",
+      "rates_per_million": {
+        "input": 0.1,
+        "cached_input": 0.01,
+        "output": 0.5
+      }
+    },
+    {
+      "id": "gpt-6.1-sol",
+      "reasoning_effort": "low",
+      "rates_per_million": {
+        "input": 2,
+        "cached_input": 0.1,
+        "output": 10
+      }
+    }
+  ]
+}
