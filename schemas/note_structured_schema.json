@@ -1,0 +1,123 @@
+{
+  "type": "object",
+  "properties": {
+    "mrn": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "note_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "note_signed_time": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "diagnosis_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$"
+    },
+    "family_history_of_ovarian_cancer_documented": {
+      "type": "boolean"
+    },
+    "diagnoses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "diagnosis_as_documented": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "histologic_subtype": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "diagnostic_qualification": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "confirmed",
+              "uncertain",
+              null
+            ]
+          },
+          "primary_origin_site": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "primary_origin_certainty": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "confirmed",
+              "uncertain",
+              null
+            ]
+          },
+          "temporal_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "current_disease",
+              "history_only",
+              "remission_or_ned",
+              "uncertain",
+              null
+            ]
+          }
+        },
+        "required": [
+          "diagnosis_as_documented",
+          "histologic_subtype",
+          "diagnostic_qualification",
+          "primary_origin_site",
+          "primary_origin_certainty",
+          "temporal_status"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "derived_classification": {
+      "type": "string",
+      "enum": [
+        "Malignant",
+        "Borderline",
+        "Benign",
+        "Other",
+        "Uncertain"
+      ]
+    }
+  },
+  "required": [
+    "mrn",
+    "note_id",
+    "note_signed_time",
+    "diagnosis_date",
+    "family_history_of_ovarian_cancer_documented",
+    "diagnoses",
+    "derived_classification"
+  ],
+  "additionalProperties": false
+}

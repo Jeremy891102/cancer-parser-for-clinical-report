@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cancer-extraction-pipeline"
+version = "0.1.0"
+description = "Study-defined NOTE, PATH and ICD extraction workflows"
+requires-python = ">=3.9"
+dependencies = ["jsonschema>=4.18,<5"]
+
+[project.scripts]
+cancer-pipeline = "cancer_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cancer_pipeline*"]

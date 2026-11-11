@@ -11,7 +11,7 @@ config = json.loads((path if path.exists() else root / 'config.example.json').re
 key = getpass.getpass('New API key (hidden; do not reuse the key pasted in chat): ').strip()
 if not key:
     raise SystemExit('No key saved.')
-config['api_key'] = key
+config['azure_api_key' if config.get('provider') == 'nyu_gateway' else 'api_key'] = key
 os.umask(0o077)
 temporary = path.with_name('config.credentials.local.json')
 with temporary.open('w', encoding='utf-8') as stream:

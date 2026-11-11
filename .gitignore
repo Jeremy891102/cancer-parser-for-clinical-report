@@ -17,3 +17,14 @@ __pycache__/
 *.py[cod]
 .venv/
 .DS_Store
+
+results/
+
+*.egg-info/
+
+build/
+
+dist/
+
+# Private patient review notes.
+docs/local_date_correction_cases.md

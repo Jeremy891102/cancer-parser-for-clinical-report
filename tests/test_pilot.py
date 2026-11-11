@@ -61,6 +61,29 @@ class PilotTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             app.check_live_config({'base_url':'http://example.com/v1','data_approved_for_endpoint':True},'test-key')
 
+    def test_nyu_gateway_route_and_key_are_provider_specific(self):
+        config={'provider':'nyu_gateway','base_url':'https://kong-api.prod1.nyumc.org'}
+        with patch.dict(app.os.environ, {'AZURE_OPENAI_API_KEY':'AZURE_TEST','OPENAI_API_KEY':'WRONG','LLM_API_BASE_URL':''}):
+            self.assertEqual(app.resolve_key(config),'AZURE_TEST')
+            self.assertEqual(app.model_base_url(config,{'id':'gpt-5.4-mini','model_version':'gpt-5.4-mini/v1.0.0'}),
+                             'https://kong-api.prod1.nyumc.org/gpt-5.4-mini/v1.0.0')
+        with patch.dict(app.os.environ, {'AZURE_OPENAI_API_KEY':'','OPENAI_API_KEY':'WRONG'}):
+            self.assertEqual(app.resolve_key(config),'')
+        with self.assertRaises(app.SetupError):
+            app.model_base_url(config,{'id':'gpt-5.4-mini'})
+
+    def test_gateway_request_includes_api_key_header(self):
+        from unittest.mock import MagicMock
+        response=MagicMock();response.__enter__.return_value=response
+        response.read.return_value=b'{"choices": []}';response.headers={}
+        opener=MagicMock();opener.open.return_value=response
+        with patch.object(app.urllib.request,'build_opener',return_value=opener):
+            app.request_completion('https://example.test/model/v1.0.0',{},'TEST_KEY',gateway=True)
+        request=opener.open.call_args[0][0]
+        self.assertEqual(request.full_url,'https://example.test/model/v1.0.0/chat/completions')
+        self.assertEqual(request.get_header('Api-key'),'TEST_KEY')
+        self.assertEqual(request.get_header('Authorization'),'Bearer TEST_KEY')
+
     def test_empty_choices_and_truncation_are_not_success(self):
         self.assertEqual(app.decode_response({'choices':[]})[0],'invalid_response')
         value={'choices':[{'message':{'content':json.dumps(output())},'finish_reason':'length'}]}

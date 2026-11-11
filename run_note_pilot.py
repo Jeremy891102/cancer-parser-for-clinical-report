@@ -13,6 +13,17 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from cancer_pipeline.formats import validate_note
+
+def validate_output(value):
+    return validate_note(value, TEMPLATE, SUBTYPES)
+
+from cancer_pipeline.gateway import (
+    SetupError, check_live_config, decode_response, estimate_cost, make_payload,
+    model_base_url, request_completion, resolve_key,
+)
+
+
 ROOT = Path(__file__).resolve().parent
 TEMPLATE = json.loads((ROOT / 'schemas/note_output_format.json').read_text())
 SUBTYPES = {r['name'] for r in json.loads((ROOT / 'schemas/subtypes_56.json').read_text())}
@@ -21,46 +32,6 @@ FIELDS = ['histologic_subtype', 'diagnostic_qualification', 'primary_origin_site
           'primary_origin_certainty', 'temporal_status']
 
 
-def validate_output(value):
-    errors = []
-    if not isinstance(value, dict) or set(value) != set(TEMPLATE):
-        return ['Output keys do not match the fixed NOTE schema']
-    for key in ['mrn', 'note_id', 'note_signed_time', 'diagnosis_date']:
-        if value[key] is not None and not isinstance(value[key], str):
-            errors.append(key + ' must be a string or null')
-    date = value['diagnosis_date']
-    if date is not None:
-        try:
-            if not isinstance(date, str) or not re.fullmatch(r'\d{4}(?:-\d{2}(?:-\d{2})?)?', date):
-                raise ValueError()
-            parts = list(map(int, date.split('-')))
-            dt.date(parts[0], parts[1] if len(parts) > 1 else 1, parts[2] if len(parts) > 2 else 1)
-        except (ValueError, TypeError):
-            errors.append('Invalid diagnosis_date')
-    if type(value['family_history_of_ovarian_cancer_documented']) is not bool:
-        errors.append('Family-history flag must be boolean')
-    if value['derived_classification'] not in CATEGORIES:
-        errors.append('Invalid derived_classification')
-    if not isinstance(value['diagnoses'], list):
-        return errors + ['diagnoses must be a list']
-    for d in value['diagnoses']:
-        if not isinstance(d, dict) or set(d) != set(TEMPLATE['diagnoses'][0]):
-            errors.append('Diagnosis keys do not match schema')
-            continue
-        if any(v is not None and not isinstance(v, str) for v in d.values()):
-            errors.append('Diagnosis fields must be strings or null')
-            continue
-        sub = d['histologic_subtype']
-        if sub is not None and sub not in SUBTYPES and not re.fullmatch(r'other: \S.*', sub):
-            errors.append('Unknown histologic_subtype')
-        for key in ['diagnostic_qualification', 'primary_origin_certainty']:
-            if d[key] not in [None, 'confirmed', 'uncertain']:
-                errors.append('Invalid ' + key)
-        if sub is None and d['diagnostic_qualification'] is not None:
-            errors.append('Absent subtype must have null qualification')
-        if d['temporal_status'] not in [None, 'current_disease', 'history_only', 'remission_or_ned', 'uncertain']:
-            errors.append('Invalid temporal_status')
-    return errors
 
 
 def compare(prediction, expected):
@@ -75,70 +46,22 @@ def compare(prediction, expected):
     return scores
 
 
-def estimate_cost(usage, rates):
-    """Reasoning tokens already belong to completion_tokens; never add them twice."""
-    if not isinstance(usage, dict) or not rates or not all(type(usage.get(k)) is int for k in ['prompt_tokens', 'completion_tokens']):
-        return None
-    details = usage.get('prompt_tokens_details') or {}
-    if not isinstance(details, dict) or usage['prompt_tokens'] < 0 or usage['completion_tokens'] < 0:
-        return None
-    cached = details.get('cached_tokens', 0)
-    if not isinstance(cached, int) or not 0 <= cached <= usage['prompt_tokens']:
-        return None
-    return ((usage['prompt_tokens'] - cached) * rates['input']
-            + cached * rates['cached_input'] + usage['completion_tokens'] * rates['output']) / 1_000_000
 
 
-def make_payload(model, prompt, case, max_tokens, effort):
-    value = {'model': model, 'messages': [{'role': 'system', 'content': prompt},
-             {'role': 'user', 'content': json.dumps(case, ensure_ascii=False)}],
-             'response_format': {'type': 'json_object'}, 'max_completion_tokens': max_tokens, 'store': False}
-    if effort is not None:
-        value['reasoning_effort'] = effort
-    return value
 
 
-class SetupError(ValueError):
-    """Only program-authored, credential-free messages may be displayed."""
 
 
-def check_live_config(config, key):
-    url = urllib.parse.urlparse(config['base_url'])
-    if url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment:
-        raise SetupError('API base URL must be HTTPS without credentials, query or fragment')
-    if not key or not key.strip() or key.strip() in ['YOUR_KEY_HERE', 'REPLACE_ME']:
-        raise SetupError('Set a new API key with configure_key.py or OPENAI_API_KEY')
-    if config.get('data_approved_for_endpoint') is not True:
-        raise SetupError('data_approved_for_endpoint is false in config.local.json. Use data approved for the configured endpoint; set this flag true only after that is confirmed. No API request was sent.')
 
 
-class NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
 
 
-def request_completion(base_url, payload, key):
-    request = urllib.request.Request(base_url.rstrip('/') + '/chat/completions',
-        data=json.dumps(payload, ensure_ascii=False).encode(),
-        headers={'Authorization': 'Bearer ' + key.strip(), 'Content-Type': 'application/json'})
-    opener = urllib.request.build_opener(NoRedirect())
-    with opener.open(request, timeout=180) as response:
-        return json.load(response), response.headers.get('x-request-id')
 
 
-def decode_response(response):
-    choices = response.get('choices') if isinstance(response, dict) else None
-    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
-        return 'invalid_response', None
-    choice = choices[0]
-    if choice.get('finish_reason') == 'length':
-        return 'truncated', None
-    if choice.get('finish_reason') != 'stop':
-        return 'incomplete_or_filtered', None
-    try:
-        return 'parsed', json.loads(choice['message']['content'])
-    except (KeyError, TypeError, ValueError):
-        return 'invalid_json', None
+
+
+
+
 
 
 def load_jsonl(path):
@@ -184,9 +107,10 @@ def main():
     parser.add_argument('--config', type=Path, default=ROOT / 'config.local.json')
     parser.add_argument('--inputs', type=Path, default=ROOT / 'data/note_inputs_20.jsonl')
     parser.add_argument('--labels', type=Path, default=ROOT / 'data/note_labels_20.jsonl')
-    parser.add_argument('--prompt', type=Path, default=ROOT / 'prompts/note_v1.2.txt')
+    parser.add_argument('--prompt', type=Path, default=ROOT / 'prompts/note_v1.3.txt')
     parser.add_argument('--limit', type=int, default=1, help='Cases per model; default 1 for smoke testing')
     parser.add_argument('--models', nargs='+', help='Subset of model IDs from config')
+    parser.add_argument('--structured-schema', type=Path, help='Strict JSON Schema; omitted preserves legacy JSON mode')
     parser.add_argument('--execute', action='store_true', help='Actually send requests; default is offline dry run')
     args = parser.parse_args()
     if not 1 <= args.limit <= 20:
@@ -216,14 +140,19 @@ def main():
     if type(cap) is not int or not 256 <= cap <= 16000:
         raise ValueError('max_completion_tokens must be 256 to 16000')
     prompt = args.prompt.read_text()
+    schema = json.loads(args.structured_schema.read_text()) if args.structured_schema else None
+    if schema is not None and (schema.get('type') != 'object' or set(schema.get('properties', {})) != set(TEMPLATE)):
+        raise ValueError('Structured schema must match the NOTE output contract')
     print(json.dumps({'mode': 'execute' if args.execute else 'dry_run', 'cases_per_model': len(cases),
                       'models': [m['id'] for m in models], 'planned_requests': len(cases) * len(models),
-                      'prompt_characters': len(prompt), 'max_completion_tokens': cap}))
+                      'prompt_characters': len(prompt), 'max_completion_tokens': cap, 'output_mode': 'json_schema' if schema else 'json_object'}))
     if not args.execute:
         print('Offline checks passed. No requests sent, no key required.')
         return
-    key = os.environ.get('OPENAI_API_KEY') or config.get('api_key', '')
+    key = resolve_key(config)
     check_live_config(config, key)
+    for model in models:
+        check_live_config(dict(config, base_url=model_base_url(config, model)), key)
     os.umask(0o077)
     directory = ROOT / 'runs' / dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')
     directory.mkdir(parents=True, exist_ok=False, mode=0o700)
@@ -231,9 +160,16 @@ def main():
         'inputs_sha256': hashlib.sha256(args.inputs.read_bytes()).hexdigest(),
         'labels_sha256': hashlib.sha256(args.labels.read_bytes()).hexdigest(),
         'case_ids': [c['case_id'] for c in cases], 'base_url': config['base_url'],
-        'models': [{k: m.get(k) for k in ['id', 'reasoning_effort', 'rates_per_million']} for m in models], 'max_completion_tokens': cap, 'automatic_retries': 0,
+        'provider': config.get('provider', 'openai'),
+        'resolved_model_urls': {m['id']: model_base_url(config, m) for m in models},
+        'models': [{k: m.get(k) for k in ['id', 'model_version', 'reasoning_effort', 'rates_per_million']} for m in models], 'max_completion_tokens': cap, 'automatic_retries': 0,
         'evaluation_scope': 'User-reviewed development challenge set, not an unbiased holdout',
         'cost_note': 'Reference Standard pricing estimate, not a gateway invoice or a hard spending cap; no cache-write/regional charges included'}
+    manifest['output_mode'] = 'json_schema' if schema else 'json_object'
+    manifest['schema_sha256'] = hashlib.sha256(json.dumps(schema, sort_keys=True).encode()).hexdigest() if schema else None
+    (directory / 'prompt.txt').write_text(prompt)
+    if schema is not None:
+        write_private(directory / 'schema.json', schema)
     write_private(directory / 'manifest.json', manifest)
     records = []
     for model in models:
@@ -243,8 +179,9 @@ def main():
             record = {'case_id': case['case_id'], 'model': model['id'], 'expected_category': expected['derived_classification']}
             stop = False
             try:
-                response, request_id = request_completion(config['base_url'],
-                    make_payload(model['id'], prompt, case['input'], cap, model.get('reasoning_effort')), key)
+                response, request_id = request_completion(model_base_url(config, model),
+                    make_payload(model.get('model_version', model['id']), prompt, case['input'], cap, model.get('reasoning_effort'), schema=schema), key,
+                    gateway=config.get('provider') == 'nyu_gateway')
                 if not isinstance(response, dict):
                     raise ValueError('Invalid response object')
                 status, prediction = decode_response(response)

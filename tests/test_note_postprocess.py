@@ -81,4 +81,22 @@ class PostprocessTests(unittest.TestCase):
         self.assertEqual(result['patients'],[])
         self.assertEqual(result['issues'][0]['reason'],'missing_patient_id')
 
+    def test_uncertain_without_target_finding_is_not_review(self):
+        note = record('a', '1', 'N1', None, 'Uncertain', 'breast')
+        note['output']['family_history_of_ovarian_cancer_documented'] = True
+        self.assertEqual(app.aggregate([note])['patients'][0]['status'],
+                         'no_established_target_malignancy')
+
+    def test_unresolved_target_finding_is_review(self):
+        note = record('a', '1', 'N1', None, 'Uncertain')
+        note['output']['diagnoses'][0].update(
+            diagnosis_as_documented='Ovarian cyst with septations',
+            histologic_subtype=None, diagnostic_qualification=None,
+            temporal_status='current_disease')
+        self.assertEqual(app.aggregate([note])['patients'][0]['status'], 'needs_review')
+
+    def test_unresolved_mullerian_origin_is_review(self):
+        note = record('a', '1', 'N1', None, 'Uncertain', 'mullerian_unspecified')
+        self.assertEqual(app.aggregate([note])['patients'][0]['status'], 'needs_review')
+
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,95 @@
+{
+  "study_id": "breast",
+  "status": "draft",
+  "target_sites": [
+    "breast"
+  ],
+  "subtype_reference": null,
+  "unresolved_origin_sites": [],
+  "unresolved_target_pattern": "\\b(?:breast|mammary)\\b",
+  "positive_classification": "Malignant",
+  "modules": {
+    "note": {
+      "prompt": null,
+      "output_format": null,
+      "validator": "json_schema",
+      "aggregation": "classification",
+      "input_columns": {
+        "patient_id": "pat_mrn_id",
+        "source_id": "note_id",
+        "document_date": "note_signed_time",
+        "text": "full_text"
+      },
+      "input_metadata": {
+        "patient_id": "pat_mrn_id",
+        "source_id": "note_id",
+        "document_date": "note_signed_time"
+      },
+      "text_key": "full_text",
+      "output_fields": {
+        "classification": "derived_classification",
+        "diagnosis_date": "diagnosis_date",
+        "patient_id": "mrn",
+        "source_id": "note_id",
+        "document_date": "note_signed_time"
+      },
+      "model": "gpt-6-luna",
+      "max_completion_tokens": 3000,
+      "output_schema": null
+    },
+    "path": {
+      "prompt": null,
+      "output_format": null,
+      "validator": "json_schema",
+      "aggregation": "classification",
+      "input_columns": {
+        "patient_id": "mrn",
+        "source_id": "accession",
+        "document_date": "collected_datetime",
+        "text": "report_text"
+      },
+      "input_metadata": {
+        "patient_id": "mrn",
+        "source_id": "report_id",
+        "document_date": "collected_datetime"
+      },
+      "text_key": "report_text",
+      "output_fields": {
+        "classification": "derived_classification",
+        "diagnosis_date": "diagnosis_date",
+        "patient_id": "mrn",
+        "source_id": "report_id",
+        "document_date": "collected_datetime"
+      },
+      "model": "gpt-6.1-sol",
+      "max_completion_tokens": 12000,
+      "output_schema": null
+    }
+  },
+  "icd": {
+    "columns": {
+      "patient_id": "MRN",
+      "code": "ICD10_CODE",
+      "date": "DX_DATE",
+      "category": "ICD_CODE_TYPE"
+    },
+    "positive_codes": [],
+    "auxiliary_codes": [],
+    "excluded_categories": [
+      "FamilyHistory"
+    ],
+    "excluded_dates": [
+      "1899-12-30"
+    ]
+  },
+  "merge_blocking_reasons": [
+    "invalid_output",
+    "target_origin_not_confirmed",
+    "overlapping_date_precision",
+    "conflicting_note_versions",
+    "conflicting_record_versions",
+    "target_category_conflict",
+    "diagnosis_after_note_date",
+    "unusable_note_timestamp"
+  ]
+}

@@ -1,6 +1,5 @@
 {
-  "base_url": "https://api.openai.com/v1",
-  "api_key": "",
+  "base_url": "https://kong-api.prod1.nyumc.org",
   "data_approved_for_endpoint": false,
   "max_completion_tokens": 3000,
   "models": [
@@ -11,7 +10,8 @@
         "input": 0.75,
         "cached_input": 0.075,
         "output": 4.5
-      }
+      },
+      "model_version": "gpt-5.4-mini/v1.0.0"
     },
     {
       "id": "gpt-6-luna",
@@ -20,7 +20,8 @@
         "input": 0.1,
         "cached_input": 0.01,
         "output": 0.5
-      }
+      },
+      "model_version": "gpt-6-luna/v1.0.0"
     },
     {
       "id": "gpt-6.1-sol",
@@ -29,7 +30,10 @@
         "input": 2,
         "cached_input": 0.1,
         "output": 10
-      }
+      },
+      "model_version": "gpt-6.1-sol/v1.0.0"
     }
-  ]
+  ],
+  "provider": "nyu_gateway",
+  "azure_api_key": ""
 }

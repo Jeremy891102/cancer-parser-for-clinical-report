@@ -1,0 +1,100 @@
+{
+  "mrn": null,
+  "report_id": null,
+  "collected_datetime": null,
+  "diagnosis_date": null,
+  "history_of_ovarian_cancer_documented": null,
+  "has_target_site_specimen": null,
+  "specimens": [
+    {
+      "specimen_id": null,
+      "source_specimen_label": null,
+      "specimen_as_documented": null,
+      "sampled_site": null,
+      "laterality": null
+    }
+  ],
+  "diagnoses": [
+    {
+      "diagnosis_id": null,
+      "specimen_ids": [
+        null
+      ],
+      "site": null,
+      "laterality": null,
+      "diagnosis_as_documented": null,
+      "histologic_subtype": null,
+      "diagnostic_qualification": null,
+      "primary_origin_site": null,
+      "primary_origin_certainty": null,
+      "grade": null,
+      "figo_grade": null,
+      "silverberg_grade": null,
+      "nuclear_grade": null,
+      "architectural_grade": null,
+      "architectural_score": null,
+      "differentiation": null,
+      "mitotic_activity": null,
+      "mitotic_score": null,
+      "figo_stage": null,
+      "pT": null,
+      "pN": null,
+      "pM": null,
+      "tumor_size_mm": [
+        null
+      ],
+      "capsule_status": null,
+      "surface_involvement": null,
+      "lymphovascular_invasion": null,
+      "peritoneal_fluid": [
+        {
+          "specimen_type": null,
+          "result": null,
+          "result_as_documented": null
+        }
+      ],
+      "treatment_effect": null,
+      "response_scoring_system": null,
+      "response_score": null,
+      "treatment_response_as_documented": null,
+      "involved_sites": [
+        null
+      ],
+      "lymph_nodes": [
+        {
+          "site": null,
+          "laterality": null,
+          "examined_count": null,
+          "positive_count": null,
+          "result": null,
+          "sampling_status": null,
+          "result_as_documented": null
+        }
+      ],
+      "ancillary_tests": [
+        {
+          "test_name": null,
+          "result_as_documented": null,
+          "block": null
+        }
+      ],
+      "note_as_documented": null,
+      "addenda": [
+        {
+          "label": null,
+          "text_as_documented": null,
+          "histologic_subtype": null,
+          "ancillary_tests": [
+            {
+              "test_name": null,
+              "result_as_documented": null,
+              "block": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "clinical_history": null,
+  "derived_classification": null
+}
