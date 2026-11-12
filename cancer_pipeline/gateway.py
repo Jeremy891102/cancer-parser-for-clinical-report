@@ -36,7 +36,9 @@ def estimate_cost(usage, rates):
     ) / 1_000_000
 
 
-def make_payload(model, prompt, case, max_tokens, effort, schema=None):
+def make_payload(
+    model, prompt, case, max_tokens, effort, schema=None, schema_name="note_output"
+):
     value = {
         "model": model,
         "messages": [
@@ -50,7 +52,7 @@ def make_payload(model, prompt, case, max_tokens, effort, schema=None):
     if schema is not None:
         value["response_format"] = {
             "type": "json_schema",
-            "json_schema": {"name": "note_output", "strict": True, "schema": schema},
+            "json_schema": {"name": schema_name, "strict": True, "schema": schema},
         }
     if effort is not None:
         value["reasoning_effort"] = effort
@@ -135,6 +137,8 @@ def decode_response(response):
         return "truncated", None
     if choice.get("finish_reason") != "stop":
         return "incomplete_or_filtered", None
+    if isinstance(choice.get("message"), dict) and choice["message"].get("refusal"):
+        return "refused", None
     try:
         return "parsed", json.loads(choice["message"]["content"])
     except (KeyError, TypeError, ValueError):

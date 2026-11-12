@@ -35,6 +35,8 @@ class Study:
         ):
             raise ValueError("Define the study-positive classification")
         for module in settings["modules"].values():
+            if module.get("response_mode", "json") not in ("json", "structured"):
+                raise ValueError("Invalid response_mode: use json or structured")
             if module.get("validator") not in (
                 "note",
                 "path",
@@ -109,6 +111,9 @@ class Study:
             raise ValueError(
                 "Finish and review this study profile before executing inference"
             )
+        if settings.get("response_mode", "json") == "structured":
+            if not self.artifact(settings.get("output_schema")).is_file():
+                raise ValueError("Structured Outputs requires output_schema")
         for field in (
             "prompt",
             (

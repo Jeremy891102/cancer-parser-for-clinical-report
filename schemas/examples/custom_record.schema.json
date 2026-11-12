@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mrn": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "record_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "document_date": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "classification": {
+      "type": "string",
+      "enum": [
+        "Malignant",
+        "Borderline",
+        "Benign",
+        "Other",
+        "Uncertain"
+      ]
+    },
+    "diagnosis_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Supported diagnosis date, YYYY, YYYY-MM, YYYY-MM-DD, or null according to the study rules."
+    }
+  },
+  "required": [
+    "mrn",
+    "record_id",
+    "document_date",
+    "classification",
+    "diagnosis_date"
+  ]
+}

@@ -63,6 +63,11 @@ def dispatch(args):
                 if module["validator"] in ("note", "path")
                 else ("prompt", "output_schema")
             )
+            if (
+                module.get("response_mode", "json") == "structured"
+                and "output_schema" not in fields
+            ):
+                fields += ("output_schema",)
             modules[name] = {
                 "missing": [
                     field
@@ -71,6 +76,7 @@ def dispatch(args):
                     or not study.artifact(module[field]).is_file()
                 ],
                 "validator": module["validator"],
+                "response_mode": module.get("response_mode", "json"),
             }
         return dict(
             study=study.settings["study_id"],

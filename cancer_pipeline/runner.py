@@ -25,7 +25,7 @@ from .gateway import (
 )
 from .storage import save_json
 from .metadata import normalize_metadata
-from .validation import build_validator
+from .validation import build_validator, response_schema
 
 
 def file_digest(path):
@@ -162,11 +162,10 @@ def render_prompt(study, module):
     settings = study.module(module)
     prompt = study.artifact(settings["prompt"]).read_text()
     if settings["validator"] == "json_schema":
-        schema = json.loads(study.artifact(settings["output_schema"]).read_text())
-        prompt += (
-            "\n\nReturn one JSON object matching this study-defined output schema.\n"
-        )
-        prompt += json.dumps(schema, ensure_ascii=False, indent=2)
+        if settings.get("response_mode", "json") == "json":
+            schema = json.loads(study.artifact(settings["output_schema"]).read_text())
+            prompt += "\n\nReturn one JSON object matching this study-defined output schema.\n"
+            prompt += json.dumps(schema, ensure_ascii=False, indent=2)
         reference = study.settings.get("subtype_reference")
         if reference:
             prompt += "\n\nStudy-defined subtype reference.\n"
@@ -312,6 +311,8 @@ def run(
                     reasoning_effort=model.get("reasoning_effort"),
                     stop_event=stop,
                     text_key=settings["text_key"],
+                    output_schema=response_schema(study, module),
+                    schema_name=(study.settings["study_id"] + "_" + module)[:64],
                 )
                 count, cost = db.execute(
                     "SELECT COUNT(*),COALESCE(SUM(usd),0) FROM notes"

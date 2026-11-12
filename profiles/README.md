@@ -7,7 +7,7 @@ Each study supplies the following.
 - target_sites lists the normalized primary origins included in the study.
 - positive_classification names the category eligible for the target cohort.
 - modules.note.prompt and modules.path.prompt point to your extraction instructions. Define classification priorities, history/recurrence rules, dates and subtype rules here.
-- modules.*.output_schema points to your JSON Schema when validator is json_schema. Define fields, types, required keys and allowed classifications. The pipeline appends this schema to the prompt and validates the returned JSON.
+- modules.*.output_schema points to your JSON Schema when validator is json_schema. Define fields, types, required keys and allowed classifications. With response_mode structured, the pipeline sends this schema as a strict API constraint; with json, it appends the schema to the prompt. Both modes validate returned JSON.
 - modules.*.output_fields maps five top-level fields from your JSON into the common workflow. They represent the patient ID, source ID, document date, classification and diagnosis date. Additional fields and nested content follow your schema.
 - modules.*.input_columns, input_metadata and text_key describe the raw CSV columns and the model input. Identifiers remain strings.
 - modules.*.model and max_completion_tokens select the configured model and response allowance.
@@ -51,4 +51,6 @@ Its output_fields mapping would be:
 
 positive_classification must appear in the classification enum. Dates preserve YYYY, YYYY-MM or YYYY-MM-DD and must be valid calendar dates. Source IDs and document timestamps are restored from the input CSV. The raw model response remains in the audit ledger.
 
-Use a self-contained JSON Schema. The validator uses an empty external-reference registry. JSON Schema validates structure, while your prompt defines clinical classification meaning. The transport uses JSON mode with local validation. [Schema validation documentation](https://python-jsonschema.readthedocs.io/en/stable/validate/)
+Use a self-contained JSON Schema. The validator uses an empty external-reference registry. JSON Schema validates structure, while your prompt defines clinical classification meaning. Set modules.*.response_mode to structured for strict API Structured Outputs, or json for legacy JSON mode. Missing response_mode defaults to json. Structured mode requires output_schema even when using an existing ovarian validator. [Schema validation documentation](https://python-jsonschema.readthedocs.io/en/stable/validate/)
+
+See the [README configuration walkthrough](../README.md#define-a-different-output-format-with-structured-outputs) for exact file paths and strict-schema requirements. Clinical rules remain in the prompt; the schema defines structure.

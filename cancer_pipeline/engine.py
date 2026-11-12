@@ -69,6 +69,8 @@ def infer(
     reasoning_effort,
     stop_event,
     text_key="full_text",
+    output_schema=None,
+    schema_name="report_output",
 ):
     hard_stops = ("inflight", "invalid_usage", "usage_over_reserve", "http_error")
     placeholders = ",".join("?" for _ in hard_stops)
@@ -149,7 +151,13 @@ def infer(
                 finished += 1
                 continue
             payload = make_payload(
-                model_version, prompt, case["input"], completion_cap, reasoning_effort
+                model_version,
+                prompt,
+                case["input"],
+                completion_cap,
+                reasoning_effort,
+                schema=output_schema,
+                schema_name=schema_name,
             )
             limit = len(json.dumps(payload, ensure_ascii=False).encode()) + 1024
             if not case["input"][text_key].strip() or limit > 256_000:

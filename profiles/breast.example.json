@@ -35,7 +35,8 @@
       },
       "model": "gpt-6-luna",
       "max_completion_tokens": 3000,
-      "output_schema": null
+      "output_schema": null,
+      "response_mode": "structured"
     },
     "path": {
       "prompt": null,
@@ -63,7 +64,8 @@
       },
       "model": "gpt-6.1-sol",
       "max_completion_tokens": 12000,
-      "output_schema": null
+      "output_schema": null,
+      "response_mode": "structured"
     }
   },
   "icd": {

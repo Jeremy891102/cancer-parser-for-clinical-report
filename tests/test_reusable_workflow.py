@@ -66,6 +66,7 @@ class ReusableWorkflowTests(unittest.TestCase):
                 output_schema="schema.json",
                 output_format=None,
                 validator="json_schema",
+                response_mode="json",
                 aggregation="classification",
                 model="fake",
                 max_completion_tokens=3000,

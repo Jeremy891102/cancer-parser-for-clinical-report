@@ -120,3 +120,7 @@ Tests cover custom NOTE/PATH fields, resume without replay, prompt-change reject
 Legacy behavior was compared with a saved pre-refactor snapshot using 20 reviewed NOTE outputs, 56 saved NOTE predictions and all 4,435 saved PATH outputs. Validation and deterministic patient aggregation were identical. This checks software behavior separately from clinical accuracy.
 
 The new entry point has been verified offline and with simulated gateway responses. New cancer definitions require their own reviewed examples before production inference.
+
+## Structured Outputs
+
+Each NOTE/PATH module can set `response_mode: "structured"` and supply `output_schema`. The runner sends that schema with `strict: true`; it does not duplicate custom schemas in the prompt. Clinical extraction/classification/date rules stay in the study prompt. Local validation and metadata restoration still apply. Missing response_mode preserves legacy JSON mode. Changed prompt/schema artifacts require a separate run directory. See the [configuration walkthrough](../README.md#define-a-different-output-format-with-structured-outputs).
