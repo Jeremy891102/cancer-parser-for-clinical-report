@@ -1,4 +1,4 @@
-# Cancer Report Parser
+# Cancer Parser for Clinical Report
 
 Turn **progress notes, pathology reports, and ICD records** into traceable patient-level cancer data.
 
