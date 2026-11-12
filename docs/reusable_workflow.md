@@ -124,3 +124,7 @@ The new entry point has been verified offline and with simulated gateway respons
 ## Structured Outputs
 
 Each NOTE/PATH module can set `response_mode: "structured"` and supply `output_schema`. The runner sends that schema with `strict: true`; it does not duplicate custom schemas in the prompt. Clinical extraction/classification/date rules stay in the study prompt. Local validation and metadata restoration still apply. Missing response_mode preserves legacy JSON mode. Changed prompt/schema artifacts require a separate run directory. See the [configuration walkthrough](../README.md#define-a-different-output-format-with-structured-outputs).
+
+## Continuing a legacy NOTE shard on another host
+
+`run_note_partition.py --partition <private-spec.json>` adapts the existing NOTE production runner to a frozen, zero-based, stop-exclusive range of its original local six-file shard. It verifies a checksum-protected SQLite snapshot with a settled contiguous prefix before skipping those submitted rows. Each partition needs a separate private output root and a frozen partition contract. Dry-run is the default; `--execute` enables requests. Preserve original source case IDs. Retain the prefix snapshot, including held/error results, for reconciliation and the final merge; do not resume the old local shard after handing off its remaining range. The adapter does not change the production prompt, model, or response mode. Operational partition specifications and job IDs belong in ignored audit files.
