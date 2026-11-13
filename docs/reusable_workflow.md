@@ -128,3 +128,17 @@ Each NOTE/PATH module can set `response_mode: "structured"` and supply `output_s
 ## Continuing a legacy NOTE shard on another host
 
 `run_note_partition.py --partition <private-spec.json>` adapts the existing NOTE production runner to a frozen, zero-based, stop-exclusive range of its original local six-file shard. It verifies a checksum-protected SQLite snapshot with a settled contiguous prefix before skipping those submitted rows. Each partition needs a separate private output root and a frozen partition contract. Dry-run is the default; `--execute` enables requests. Preserve original source case IDs. Retain the prefix snapshot, including held/error results, for reconciliation and the final merge; do not resume the old local shard after handing off its remaining range. The adapter does not change the production prompt, model, or response mode. Operational partition specifications and job IDs belong in ignored audit files.
+
+## Offline NOTE format repair (existing ovarian contract)
+
+`repair_note_outputs.py` repairs saved NOTE exceptions without inference or network access. It is an explicit postprocessing step, separate from the production validator. Input is gzip JSONL containing `case_id`, `source_file`, `source_row`, authoritative `metadata` (`mrn`, `note_id`, `note_signed_time`), and the original `prediction`.
+
+```bash
+.venv/bin/python repair_note_outputs.py \
+  --input data/note_exceptions.jsonl.gz \
+  --output-dir runs/note-offline-repairs
+```
+
+The output directory must be new. Accepted repairs include literal `"null"` to JSON null, documented key typos, reviewed enum aliases, case-only vocabulary corrections, an explicit allowlist of unlisted tumor names preserved under `other:`, and unambiguous US/English dates with four-digit years. Early/mid/late within a named year retain year precision. Decades, ages, relative times, approximate years, ranges, and two-digit years remain pending. Missing classifications are not generated; existing classifications remain unchanged.
+
+Outputs are `repaired_predictions.jsonl.gz` (only validated records), `pending_review.jsonl.gz` (original and candidate, not accepted), `changes.jsonl.gz` (field-level audit), `repair_records.csv`, and a checksum-bearing `summary.json`. Every accepted record passes the existing NOTE validator and an idempotence check. Original ledgers are never edited. These repair files are an explicit overlay for a later reviewed merge; creating them does not update formal cohort CSVs or establish clinical accuracy.
